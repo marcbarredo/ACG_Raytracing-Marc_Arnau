@@ -1,5 +1,8 @@
 #include "phong.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include <iostream>
 
 Phong::Phong()
@@ -12,10 +15,14 @@ rho_d(Kd_), Ks(Ks_), alpha(alpha_){}
 Vector3D Phong::getReflectance(const Vector3D& n, const Vector3D& wo,
     const Vector3D& wi) const {
 
-    //FILL(...)
+    Vector3D wr = 2.0 * dot(n, wi) * n - wi;
 
-    return Vector3D(0.0);
+    double cosAlpha = std::max(dot(wo, wr), 0.0);
 
+    Vector3D diffuse = rho_d / 3.1416;
+    Vector3D specular = Ks * std::pow(cosAlpha, alpha);
+
+    return diffuse + specular;
 };
 
 double Phong::getIndexOfRefraction() const

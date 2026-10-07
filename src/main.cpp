@@ -17,12 +17,17 @@
 
 #include "shaders/intersectionshader.h"
 #include "shaders/depthshader.h"
-
+#include "shaders/normalshader.h"
+#include "shaders/whittedintegrator.h"
 
 #include "materials/phong.h"
 #include "materials/emissive.h"
+#include "materials/mirror.h"
+#include "materials/transmissive.h"
 
 #include <chrono>
+
+
 
 using namespace std::chrono;
 
@@ -51,9 +56,9 @@ void buildSceneCornellBox(Camera*& cam, Film*& film,
     Material* cyandiffuse = new Phong(Vector3D(0.2, 0.8, 0.8), Vector3D(0, 0, 0), 100);
 
     //Task 5.3
-    //Material* mirror = new Mirror();
+    Material* mirror = new Mirror();
     //Task 5.4
-    //Material* transmissive = new Transmissive(0.7);
+    Material* transmissive = new Transmissive(0.7);
 
 
     /* ******* */
@@ -79,13 +84,13 @@ void buildSceneCornellBox(Camera*& cam, Film*& film,
     double radius = 1;         
     Matrix4x4 sphereTransform1;
     sphereTransform1 = Matrix4x4::translate(Vector3D(1.5, -offset + radius, 6));
-    Shape* s1 = new Sphere(radius, sphereTransform1, blueGlossy_20); 
+    Shape* s1 = new Sphere(radius, sphereTransform1, blueGlossy_80);
 
     Matrix4x4 sphereTransform2;
     sphereTransform2 = Matrix4x4::translate(Vector3D(-1.5, -offset + 3*radius, 4));
-    Shape* s2 = new Sphere(radius, sphereTransform2, blueGlossy_80);
+    Shape* s2 = new Sphere(radius, sphereTransform2, transmissive);
 
-    Shape* square = new Square(Vector3D(offset + 0.999, -offset-0.2, 3.0), Vector3D(0.0, 4.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(-1.0, 0.0, 0.0), cyandiffuse);
+    Shape* square = new Square(Vector3D(offset + 0.999, -offset-0.2, 3.0), Vector3D(0.0, 4.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(-1.0, 0.0, 0.0), mirror);
 
     myScene.AddObject(s1);
     myScene.AddObject(s2);
@@ -131,6 +136,7 @@ void buildSceneSphere(Camera*& cam, Film*& film,
     Matrix4x4 sphereTransform3;
     sphereTransform3 = sphereTransform3.translate(Vector3D(1.0, -0.75, 3.5));
     Shape* s3 = new Sphere(0.25, sphereTransform3, green_100);
+    
 
     // Store the objects in the object list
     myScene.AddObject(s1);
@@ -198,8 +204,10 @@ void PaintImage(Film* film)
         for (size_t col = 0; col < resX; col++)
         { 
             //CHANGE...()
-            Vector3D random_color = Vector3D((double)rand() / RAND_MAX, (double)rand() / RAND_MAX, (double)rand() / RAND_MAX);            
-            film->setPixelValue(col,lin, random_color);
+            //Vector3D random_color = Vector3D((double)rand() / RAND_MAX, (double)rand() / RAND_MAX, (double)rand() / RAND_MAX);
+            Vector3D color = Vector3D((double)col / resX, (double)lin / resY, 0.0);
+            //film->setPixelValue(col,lin, random_color);
+            film->setPixelValue(col, lin, color);
            
         }
     }
@@ -218,13 +226,13 @@ int main()
 
     // Declare the shader
     Vector3D bgColor(0.0, 0.0, 0.0); // Background color (for rays which do not intersect anything)
-    Vector3D intersectionColor(1,0,0);
+    Vector3D intersectionColor(0,1,0);
     
     //First Assignment
-    Shader *shader = new IntersectionShader (intersectionColor, bgColor);
+    //Shader *shader = new IntersectionShader (intersectionColor, bgColor);
     //Shader *depthshader = new DepthShader (intersectionColor,7.5f, bgColor);
-    //(... normal, whitted) ...
-
+    //Shader *normalshader = new NormalShader(bgColor);
+    Shader *whittedshader = new WhittedIntegrator(bgColor);
   
 
     // Build the scene---------------------------------------------------------
@@ -233,17 +241,19 @@ int main()
     Camera* cam;
     Scene myScene;
     //Create Scene Geometry and Illumiantion
-    buildSceneSphere(cam, film, myScene); //Task 2,3,4;
-    //buildSceneCornellBox(cam, film, myScene); //Task 5
+    //buildSceneSphere(cam, film, myScene); //Task 2,3,4;
+    buildSceneCornellBox(cam, film, myScene); //Task 5
 
     //---------------------------------------------------------------------------
 
     //Paint Image ONLY TASK 1
-    PaintImage(film);
+    //PaintImage(film);
 
     // Launch some rays! TASK 2,3,...   
     auto start = high_resolution_clock::now();
-    //raytrace(cam, shader, film, myScene.objectsList, myScene.LightSourceList);
+    raytrace(cam, whittedshader, film,
+             myScene.objectsList,
+             myScene.LightSourceList);
     auto stop = high_resolution_clock::now();
 
     

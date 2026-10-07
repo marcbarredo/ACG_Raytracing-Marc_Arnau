@@ -1,0 +1,25 @@
+# CMake
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# Compiled files
+*.o
+*.obj
+*.out
+
+# Render outputs
+output.bmp
+output.exr
+
+
