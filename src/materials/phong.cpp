@@ -11,6 +11,14 @@ Phong::Phong()
 Phong::Phong(Vector3D Kd_, Vector3D Ks_, float alpha_):
 rho_d(Kd_), Ks(Ks_), alpha(alpha_){}
 
+//n -> normal
+// wo -> viewing direction
+//wi -> incident light direction
+// wr -> reflection direction
+
+//rho_d = pd -> diffuse
+// Ks -> specular
+//alpha -> shininess
 
 Vector3D Phong::getReflectance(const Vector3D& n, const Vector3D& wo,
     const Vector3D& wi) const {
@@ -20,7 +28,7 @@ Vector3D Phong::getReflectance(const Vector3D& n, const Vector3D& wo,
     double cosAlpha = std::max(dot(wo, wr), 0.0);
 
     Vector3D diffuse = rho_d / 3.1416;
-    Vector3D specular = Ks * std::pow(cosAlpha, alpha);
+    Vector3D specular = ((alpha + 2.0)/(2.0 * 3.1416))* Ks * std::pow(cosAlpha, alpha);
 
     return diffuse + specular;
 };

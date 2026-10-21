@@ -8,22 +8,22 @@
 
 WhittedIntegrator::WhittedIntegrator() :
     Shader(Vector3D(0.0))
-{ }
+{
+}
 
 
 WhittedIntegrator::WhittedIntegrator(Vector3D bgColor_) :
     Shader(bgColor_)
-{ }
+{
+}
 
 
 Vector3D WhittedIntegrator::computeColor(
-    const Ray &r,
-    const std::vector<Shape*> &objList,
-    const std::vector<LightSource*> &lsList) const
+    const Ray& r,
+    const std::vector<Shape*>& objList,
+    const std::vector<LightSource*>& lsList) const
 {
-    // --------------------------------------------------
     // MAXIMUM RAY DEPTH
-    // --------------------------------------------------
     if (r.depth > 10)
     {
         return bgColor;
@@ -32,23 +32,19 @@ Vector3D WhittedIntegrator::computeColor(
 
     Intersection its;
 
-    // --------------------------------------------------
     // RAY MISSES THE SCENE
-    // --------------------------------------------------
     if (!Utils::getClosestIntersection(r, objList, its))
     {
         return bgColor;
     }
 
 
-    const Material &material = its.shape->getMaterial();
+    const Material& material = its.shape->getMaterial();
 
     Vector3D wo = -r.d;
 
 
-    // --------------------------------------------------
     // PERFECT MIRROR REFLECTION
-    // --------------------------------------------------
     if (material.hasSpecular())
     {
         Vector3D wr =
@@ -70,9 +66,7 @@ Vector3D WhittedIntegrator::computeColor(
     }
 
 
-    // --------------------------------------------------
     // PERFECT SPECULAR TRANSMISSION / REFRACTION
-    // --------------------------------------------------
     if (material.hasTransmission())
     {
         Vector3D n = its.normal;
@@ -95,15 +89,10 @@ Vector3D WhittedIntegrator::computeColor(
         }
 
 
-        double radicand =
-            1.0 -
-            mu * mu *
-            (1.0 - cosTheta * cosTheta);
+        double radicand = 1.0 - mu * mu * (1.0 - cosTheta * cosTheta);
 
 
-        // ----------------------------------------------
         // REFRACTION
-        // ----------------------------------------------
         if (radicand >= 0.0)
         {
             Vector3D wt =
@@ -111,7 +100,7 @@ Vector3D WhittedIntegrator::computeColor(
                 n * (
                     mu * cosTheta -
                     std::sqrt(radicand)
-                );
+                    );
 
             Ray refractedRay(
                 its.itsPoint,
@@ -129,9 +118,7 @@ Vector3D WhittedIntegrator::computeColor(
         }
 
 
-        // ----------------------------------------------
         // TOTAL INTERNAL REFLECTION
-        // ----------------------------------------------
         else
         {
             Vector3D wr =
@@ -154,19 +141,15 @@ Vector3D WhittedIntegrator::computeColor(
     }
 
 
-    // --------------------------------------------------
     // AMBIENT TERM
     // Lo = at * rho_d + ...
-    // --------------------------------------------------
     double ambient = 0.3;
 
     Vector3D color =
         material.getDiffuseReflectance() * ambient;
 
 
-    // --------------------------------------------------
     // DIRECT ILLUMINATION
-    // --------------------------------------------------
     for (size_t i = 0; i < lsList.size(); i++)
     {
         // Position of the point light
@@ -185,9 +168,7 @@ Vector3D WhittedIntegrator::computeColor(
             toLight.normalized();
 
 
-        // --------------------------------------------------
         // SHADOW RAY
-        // --------------------------------------------------
         Ray shadowRay(
             its.itsPoint,
             wi,
@@ -204,9 +185,7 @@ Vector3D WhittedIntegrator::computeColor(
             );
 
 
-        // --------------------------------------------------
         // LIGHT CONTRIBUTION
-        // --------------------------------------------------
         if (!inShadow)
         {
             // (wi · n)
@@ -221,8 +200,8 @@ Vector3D WhittedIntegrator::computeColor(
             Vector3D fr =
                 material.getReflectance(
                     its.normal,
-                    wo,
-                    wi
+                    wi,
+                    wo
                 );
 
 

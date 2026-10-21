@@ -5,7 +5,7 @@
 #include <algorithm>
 
 DepthShader::DepthShader() :
-    color(Vector3D(1, 0, 0))
+    color(Vector3D(0, 1, 0))
 { }
 
 DepthShader::DepthShader(Vector3D hitColor_, double maxDist_, Vector3D bgColor_) :
