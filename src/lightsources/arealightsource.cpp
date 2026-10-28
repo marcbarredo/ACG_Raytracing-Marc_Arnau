@@ -14,9 +14,9 @@ Vector3D AreaLightSource::getIntensity() const
 
 Vector3D AreaLightSource::sampleLightPosition()   const
 {
-    //FILL(...)
-    // 
-    //New Randam Pos inside Area Lightsource
-    return Vector3D(0.0);
+    double u = (double)rand() / RAND_MAX;
+    double v = (double)rand() / RAND_MAX;
+
+    return myAreaLightsource->corner + u * myAreaLightsource->v1 + v * myAreaLightsource->v2;
 }
 
