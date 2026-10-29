@@ -20,6 +20,9 @@
 #include "shaders/normalshader.h"
 #include "shaders/whittedintegrator.h"
 #include "shaders/hemisphericaldirectintegrator.h"
+#include "shaders/areadirectintegrator.h"
+
+#include "lightsources/arealightsource.h"
 
 #include "materials/phong.h"
 #include "materials/emissive.h"
@@ -75,7 +78,8 @@ void buildSceneCornellBox(Camera*& cam, Film*& film,
     Shape* topPlan = new InfinitePlan(Vector3D(0, offset, 0), Vector3D(0, -1, 0), greyDiffuse);
     Shape* bottomPlan = new InfinitePlan(Vector3D(0, -offset, 0), Vector3D(0, 1, 0), greyDiffuse);
     Shape* backPlan = new InfinitePlan(Vector3D(0, 0, 3 * offset), Vector3D(0, 0, -1), greyDiffuse);
-    Shape* square_emissive = new Square(Vector3D(-1.0, 3.0, 3.0), Vector3D(2.0, 0.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(0.0, -1.0, 0.0), emissive);
+    //Shape* square_emissive = new Square(Vector3D(-1.0, 3.0, 3.0), Vector3D(2.0, 0.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(0.0, -1.0, 0.0), emissive);
+    Square* square_emissive = new Square(Vector3D(-1.0, 3.0, 3.0), Vector3D(2.0, 0.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(0.0, -1.0, 0.0), emissive);
 
     myScene.AddObject(leftPlan);
     myScene.AddObject(rightPlan);
@@ -193,7 +197,8 @@ int main()
     //Shader *depthshader = new DepthShader (intersectionColor,7.5f, bgColor);
     //Shader *normalshader = new NormalShader(bgColor);
     //Shader *whittedshader = new WhittedIntegrator(bgColor);
-	Shader* hemisphericalDirectShader = new HemisphericalDirectIntegrator(bgColor);
+	//Shader* hemisphericalDirectShader = new HemisphericalDirectIntegrator(bgColor);
+    Shader* areaDirectShader = new AreaDirectIntegrator(bgColor);
   
 
     // Build the scene---------------------------------------------------------
@@ -212,9 +217,7 @@ int main()
 
     // Launch some rays! TASK 2,3,...   
     auto start = high_resolution_clock::now();
-    raytrace(cam, hemisphericalDirectShader, film,
-             myScene.objectsList,
-             myScene.LightSourceList);
+    raytrace(cam,areaDirectShader,film,myScene.objectsList,myScene.LightSourceList);
     auto stop = high_resolution_clock::now();
 
     
