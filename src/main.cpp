@@ -21,8 +21,12 @@
 #include "shaders/whittedintegrator.h"
 #include "shaders/hemisphericaldirectintegrator.h"
 #include "shaders/areadirectintegrator.h"
+#include "shaders/purepathtracer.h"
+#include "shaders/neeintegrator.h"
+
 
 #include "lightsources/arealightsource.h"
+
 
 #include "materials/phong.h"
 #include "materials/emissive.h"
@@ -87,6 +91,10 @@ void buildSceneCornellBox(Camera*& cam, Film*& film,
     myScene.AddObject(bottomPlan);
     myScene.AddObject(backPlan);
     myScene.AddObject(square_emissive);
+    
+    AreaLightSource* areaLight = new AreaLightSource(square_emissive);
+
+    myScene.LightSourceList->push_back(areaLight);
 
 
     // Place the Spheres and square inside the Cornell Box
@@ -97,9 +105,9 @@ void buildSceneCornellBox(Camera*& cam, Film*& film,
 
     Matrix4x4 sphereTransform2;
     sphereTransform2 = Matrix4x4::translate(Vector3D(-1.5, -offset + 3 * radius, 4));
-    Shape* s2 = new Sphere(radius, sphereTransform2, transmissive);
+    Shape* s2 = new Sphere(radius, sphereTransform2, blueGlossy_20);
 
-    Shape* square = new Square(Vector3D(offset + 0.999, -offset - 0.2, 3.0), Vector3D(0.0, 4.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(-1.0, 0.0, 0.0), mirror);
+    Shape* square = new Square(Vector3D(offset + 0.999, -offset - 0.2, 3.0), Vector3D(0.0, 4.0, 0.0), Vector3D(0.0, 0.0, 2.0), Vector3D(-1.0, 0.0, 0.0), blueGlossy_80);
 
     myScene.AddObject(s1);
     myScene.AddObject(s2);
@@ -198,7 +206,9 @@ int main()
     //Shader *normalshader = new NormalShader(bgColor);
     //Shader *whittedshader = new WhittedIntegrator(bgColor);
 	//Shader* hemisphericalDirectShader = new HemisphericalDirectIntegrator(bgColor);
-    Shader* areaDirectShader = new AreaDirectIntegrator(bgColor);
+    //Shader* areaDirectShader = new AreaDirectIntegrator(bgColor);
+    //Shader* purePathShader = new PurePathTracer(bgColor);
+    Shader* neeShader =new NEEIntegrator(bgColor);
   
 
     // Build the scene---------------------------------------------------------
@@ -217,7 +227,7 @@ int main()
 
     // Launch some rays! TASK 2,3,...   
     auto start = high_resolution_clock::now();
-    raytrace(cam,areaDirectShader,film,myScene.objectsList,myScene.LightSourceList);
+    raytrace(cam,neeShader,film,myScene.objectsList,myScene.LightSourceList);
     auto stop = high_resolution_clock::now();
 
     
