@@ -1,11 +1,10 @@
 #include "ray.h"
 
-Ray::Ray() : minT(0.001), maxT(INFINITY), depth(0)
+Ray::Ray() : minT(0.001),maxT(INFINITY),depth(0),specularBounce(false)
 {}
 
-Ray::Ray(const Vector3D &ori, const Vector3D &dir, size_t dep, double start,
-         double end)
-         : o(ori), d(dir), minT(start), maxT(end), depth(dep)
+Ray::Ray(const Vector3D &ori,const Vector3D &dir,size_t dep,double start,double end):
+    o(ori),d(dir),minT(start),maxT(end),depth(dep),specularBounce(false)
 {}
 
 std::string Ray::toString() const
